@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>秀吧添加-象牙塔</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{:config('static_dir')}layui/css/layui.css?_v={:config('static_ver')}" media="all" />
+    <link rel="stylesheet" href="{:config('static_dir')}css/public.css?_v={:config('static_ver')}" media="all" />
+    <style type="text/css">
+        /*.layer-photos-demo img {
+            margin: 10px 10px 10px 10px;
+        }*/
+        .item {
+            /*position: relative;*/
+            float: left;
+            width: 120px;
+            height: 120px;
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+
+        .img {
+            zoom: 1;
+        }
+
+            .img .shequ-fc {
+                /*background: url({:config('static_dir')}images/trip_s.png) repeat-x 0 0;*/
+                height: 27px;
+                width: 120px;
+                text-align: center;
+                position: absolute;
+                bottom: 1px;
+                color: white;
+                line-height: 27px;
+            }
+
+                .img .shequ-fc a {
+                    color: #fff;
+                }
+
+            .img .b3 {
+                position: relative;
+            }
+    </style>
+</head>
+<body class="childrenBody">
+    <form class="layui-form layui-row layui-col-space10" id="formData">
+        <input type="hidden" name="id" value="{$detail.SI_Id}" />
+        
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">分类</label>
+                <div class="layui-input-block">
+                    <select name="SI_SC_Id" lay-search lay-filter="category" lay-verify="category">
+                        <option value="">选择分类</option>
+                        {volist name="$catlist" id="vo"}
+                        <option value="{$vo.SC_Id}" {in name="$vo.SC_Id" value="$detail.SI_SC_Id"}selected{/in}>{$vo.SC_Name}</option>
+                        {/volist}
+                    </select>
+                    <input type="hidden" name="SI_SC_Name" value="{$detail.SI_SC_Name}" />
+                </div>
+            </div>
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">标签</label>
+                <div class="layui-input-block">
+                    <select xm-select="tags" xm-select-type="2"><!-- multiple name="SI_Tags[]" -->
+                        <option value="">请选择标签</option>
+                        {volist name="$taglist" id="vo"}
+                        <option value="{$vo.T_Id}" {in name="$vo.T_Name" value="$detail.SI_Tags"}selected{/in}>{$vo.T_Name}</option>
+                        {/volist}
+                    </select>
+                    <input type="hidden" name="SI_Tags" value="{$detail.SI_Tags}" lay-verify="tags" />
+                </div>
+            </div>
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">类型</label>
+                <div class="layui-col-xs4" lay-verify="dataType">
+                    <input type="radio" name="SI_Type" value="1" title="图片" lay-filter="dataType" lay-skin="primary" {if condition="($detail.SI_Type eq 1) or (!$detail.SI_Type)"}checked{/if} />
+                    <input type="radio" name="SI_Type" value="2" title="视频" lay-filter="dataType" lay-skin="primary" {if condition="$detail.SI_Type eq 2"}checked{/if} />
+                </div>
+            </div>
+            <div class="layui-form-item layui-row layui-col-xs12 div_pic {if condition="$detail.SI_Type eq 2"}layui-hide{/if}">
+                <label class="layui-form-label">图片集</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn" id="btnupload_img">
+                        <i class="layui-icon"></i>上传图片集
+                    </button>
+                    <div class="layer-photos-demo" id="pics">
+                        {volist name="attach_list" id="vo"}
+                        {notempty name="vo"}
+                        <div class="item">
+                            <div class="img" style="margin-top: 1px;">
+                                <div class="b3">
+                                    <img src="{:config('upload_host')}{$vo.A_AttachPath}" width="120" height="120" data-ids="{$vo.A_Id}"><div class="shequ-fc" onclick="delImage(this)"><a href="javascript:;">删除</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/notempty}
+                        {/volist}   
+                    </div>
+                    <input type="hidden" name="attachIds" value="{$detail.attachIds}" />
+                </div>
+            </div>
+            <div class="layui-row div_video {if condition="($detail.SI_Type eq 1) or (!$detail.SI_Type)"}layui-hide{/if}">
+                <div class="magb15 layui-col-md3 layui-col-xs12">
+                    <label class="layui-form-label">视频文件</label>
+                    <div class="layui-col-md5 layui-col-xs5">
+                        <button type="button" class="layui-btn" id="btnupload_video"><i class="layui-icon"></i>上传视频</button>
+                    </div>
+                </div>
+                <div class="magb15 layui-col-md5 layui-col-xs12">
+                    <label class="layui-form-label">文件位置</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="attachPath" value="{if condition='$detail.attachPath'}{:config('upload_host')}{$detail.attachPath}{/if}" readonly class="layui-input bm_path layui-readonly" />
+                        <input type="hidden" name="SI_MaterialsFace" value="{$detail.SI_MaterialsFace}" />
+                    </div>
+                </div>
+                <div class="magb15 layui-col-md2 layui-col-xs12" style="text-align:center">
+                    <button type="button" class="layui-btn" id="btnplay">播放</button>
+                </div>
+            </div>
+           
+            <div class="layui-form-item layui-row layui-col-xs12" style="text-align:right; display:none">
+                <button type="button" class="layui-btn" id="btn_getimg">↓ 获取秀吧内图片设置图片集</button>
+            </div>
+
+            <div class="layui-form-item  layui-row layui-col-xs12">
+                <label class="layui-form-label">内容</label>
+                <div class="layui-input-block">
+                    <textarea class="layui-textarea" name="SI_Content" lay-verify="dataContent">{$detail.SI_Content}</textarea>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">定位</label>
+                <div class="layui-input-block">
+                    <input type="text" name="SI_LocationName" value="{$detail.SI_LocationName}" class="layui-input layui-input-inline" placeholder="定位地址名称">
+                    <input type="text" name="SI_LocationLat" value="{$detail.SI_LocationLat}" class="layui-input layui-input-inline" placeholder="定位坐标经度">
+                    <input type="text" name="SI_LocationLong" value="{$detail.SI_LocationLong}" class="layui-input layui-input-inline" placeholder="定位坐标纬度">
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">是否公开</label>
+                <div class="layui-col-xs4" lay-verify="dataType">
+                    <input type="radio" name="SI_Scope" value="0" title="公开" lay-skin="primary" {if condition="($detail.SI_Scope eq '0') or (!$detail.SI_Scope)"}checked{/if} />
+                    <input type="radio" name="SI_Scope" value="1" title="私密" lay-skin="primary" {if condition="$detail.SI_Scope eq '1'"}checked{/if} />
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label"><i class="layui-icon">&#xe60e;</i>状　态</label>
+                <div class="layui-input-inline newsStatus">
+                    <select name="SI_Status" lay-verify="">
+                        <option value="0" {if condition="$detail.SI_Status eq '0'"}selected{/if}>保存草稿</option>
+                        <option value="1" {if condition="$detail.SI_Status eq '1'"}selected{/if}>等待审核</option>
+                        <option value="2" {if condition="$detail.SI_Status eq '2'"}selected{/if}>通过审核</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="layui-bg-gray" />
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label"></label>
+                <div class="layui-input-block">
+                    <a class="layui-btn layui-btn-sm" lay-filter="addData" lay-submit><i class="layui-icon">&#xe609;</i>发布</a>
+                    <a class="layui-btn layui-btn-primary layui-btn-sm" lay-filter="look" lay-submit>预览</a>
+                </div>
+            </div>
+        
+    </form>
+<script type="text/javascript" src="{:config('static_dir')}layui/layui.all.js?_v={:config('static_ver')}"></script>
+<script type="text/javascript">
+layui.config({
+    base: "{:config('static_dir')}js/"    //此处写的相对路径, 实际以项目中的路径为准
+}).extend({
+    formSelects: 'formSelects-v3'
+});
+layui.use(['jquery','form','layer','layedit','laydate','upload','formSelects'],function(){
+    var form = layui.form
+        // layer = parent.layer === undefined ? layui.layer : top.layer,
+        layer = layui.layer,
+        laypage = layui.laypage,
+        upload = layui.upload,
+        layedit = layui.layedit,
+        laydate = layui.laydate,
+        $ = layui.jquery,
+        formSelects = layui.formSelects;
+
+    //用于同步编辑器内容到textarea
+    // layedit.sync(editIndex);
+
+    //上传图片
+    upload.render({
+        elem: '#btnupload_img',
+        url: "{:config('api_host')}storage/upload",
+        multiple: true,
+        accept: 'images',
+        data: {
+            module:"showme", 
+            type:"images",
+            backend:1
+        },
+        before: function (obj) {
+            var index = layer.msg('上传中...请稍候',{icon: 16,time:false,shade:0.6});
+            //预读本地文件示例，不支持ie8
+            /*obj.preview(function (index, file, result) {
+               $('#pics').append('<img src="' + result + '" alt="' + file.name + '" class="layui-upload-img" width="100px" height="100px">')
+            });*/
+        },
+        done: function (res) {
+            if (res.Code == 200) {
+                //上传完毕
+                $('#pics').append('<div class="item"><div class="img" style="margin-top: 1px;"><div class="b3"><img src="' + res.Data.url
+                    + '" width="120" height="120" data-aid="' + res.Data.id + '"><div class="shequ-fc" onclick="delImage(this)"><a href="javascript:;" >删除</a></div></div></div>');
+                var aid = $("input[name=attachIds]").val();
+                aid = aid!='' ? aid + ',' + res.Data.id : res.Data.id;
+                $("input[name=attachIds]").val(aid);
+                $("input[name=SI_MaterialsFace]").val(res.Data.screenshot);
+                layer.closeAll();
+                layer.msg(res.Msg);
+            }else{
+                layer.msg(res.Msg);
+            }
+        }
+    });
+
+    //上传视频
+    upload.render({
+        elem: '#btnupload_video',
+        url: "{:config('api_host')}storage/upload",
+        multiple: false,
+        accept: 'video',
+        data: {
+            module:"showme", 
+            type:"video",
+            backend:1
+        },
+        before: function (obj) {
+            var index = layer.msg('上传中...请稍候',{icon: 16,time:false,shade:0.6});
+        },
+        done: function (res) {
+            if (res.Code == 200) {
+                //上传完毕
+                $("input[name=attachIds]").val(res.Data.id);
+                $("#attachPath").val(res.Data.url);
+                $("input[name=SI_MaterialsFace]").val(res.Data.screenshot);
+                layer.closeAll();
+                layer.msg(res.Msg);
+            }else{
+                layer.msg(res.Msg);
+            }
+        }
+    });
+
+    //格式化时间
+    function filterTime(val){
+        if(val < 10){
+            return "0" + val;
+        }else{
+            return val;
+        }
+    }
+    //定时发布
+    var time = new Date();
+    var submitTime = time.getFullYear()+'-'+filterTime(time.getMonth()+1)+'-'+filterTime(time.getDate())+' '+filterTime(time.getHours())+':'+filterTime(time.getMinutes())+':'+filterTime(time.getSeconds());
+    laydate.render({
+        elem: '#release',
+        type: 'datetime',
+        trigger : "click",
+        done : function(value, date, endDate){
+            submitTime = value;
+        }
+    });
+    form.on("radio(release)",function(data){
+        if(data.elem.title == "定时发布"){
+            $(".releaseDate").removeClass("layui-hide");
+            $(".releaseDate #release").attr("lay-verify","required");
+        }else{
+            $(".releaseDate").addClass("layui-hide");
+            $(".releaseDate #release").removeAttr("lay-verify");
+            submitTime = time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate()+' '+time.getHours()+':'+time.getMinutes()+':'+time.getSeconds();
+        }
+    });
+
+    form.on("radio(dataType)", function (data) {
+        if (data.elem.title == "视频") {
+            $(".div_video").removeClass("layui-hide");
+            $(".div_pic").addClass("layui-hide");
+        } else {
+            $(".div_video").addClass("layui-hide");
+            $(".div_pic").removeClass("layui-hide");
+        }
+    });
+
+    //验证
+    form.verify({
+        category : function(val, obj){
+            if($(obj).val() == '') return "分类必须选择";
+        },
+        dataType : function(val, obj){
+            var checked = false;
+            $(obj).find('input').each(function(index, eml) {
+                if (eml.checked===true) checked=true;
+            });
+            if(checked === false) return "类型必须选择";
+        },
+        dataContent : function(val, obj){
+            if($(obj).val() == '') return "内容不能为空";
+        }
+    })
+
+    //提交
+    form.on("submit(addData)",function(data){
+        //截取文章内容中的一部分文字放入文章摘要
+        // var abstract = layedit.getText(editIndex).substring(0,50);
+        //弹出loading
+        var index = layer.msg('数据提交中，请稍候',{icon: 16,time:false,shade:0.6});
+
+        //多选标签赋值
+        $("input[name=SI_Tags]").val(formSelects.value('tags','name'));
+
+        //多选学校
+        // $("input[name=SI_SchoolIds]").val(formSelects.value('schools','valStr'));
+        // $("input[name=SI_SchoolNames]").val(formSelects.value('schools','name'));
+
+        //提交数据
+        $.post("edit",$("#formData").serializeArray(),function(res){
+            if (res.status == 1) {
+                setTimeout(function(){
+                    layer.close(index);
+                    layer.msg(res.msg);
+                    layer.closeAll("iframe");
+                    //刷新父页面
+                    parent.location.reload();
+                },500);
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+        return false;
+    })
+
+    //预览
+    form.on("submit(look)",function(){
+        layer.alert("此功能需要前台展示，实际开发中传入对应的必要参数进行文章内容页面访问");
+        return false;
+    });
+
+    $("#btnplay").on("click", function () {
+        open_video($("#attachPath").val());
+    });
+
+    function open_video(url) {
+        //iframe层-多媒体
+        layer.open({
+            type: 2,
+            title: false,
+            area: ['630px', '360px'],
+            shade: 0.8,
+            closeBtn: 0,
+            shadeClose: true,
+            content: url
+        });
+    };
+
+    form.on('select(category)', function(data){
+        // console.log(data.elem); //得到select原始DOM对象
+        // console.log(data.value); //得到被选中的值
+        // console.log(data.othis); //得到美化后的DOM对象
+
+        // var sid = formSelects.value('schools','valStr');
+
+        //获取选中的分类名称
+        if (data.value!='') {
+            $("input[name=SI_SC_Name]").val($(data.elem).find('option:selected').text());
+        }
+        
+
+    }); 
+
+});
+
+function delImage(obj){
+    $(obj).parent().parent().parent().remove();
+    var ids = '';
+    $("#pics .item img").each(function(index, el) {
+        ids = ids!='' ? ids + ',' + $(this).data('ids') : $(this).data('ids');
+    });
+    $("input[name=attachIds]").val(ids);
+}
+
+</script>
+</body>
+</html>

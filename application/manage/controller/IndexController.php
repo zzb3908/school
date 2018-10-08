@@ -103,13 +103,13 @@ class IndexController extends BaseController
                         [
                             'title' => '约吧列表',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/date/index',
                             'spread' => false,
                         ],
                         [
                             'title' => '约吧留言',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/date/message',
                             'spread' => false,
                         ],
                     ],
