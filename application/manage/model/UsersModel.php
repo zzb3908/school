@@ -14,14 +14,14 @@ namespace app\manage\model;
 use think\Model;
 use app\common\service\Cache;
 
-class DateModel extends Model{
+class UsersModel extends Model{
 
-    protected $table = 'extr_inviteinfo';
-    protected $pk = 'II_Id';
+    protected $table = 'own_userinfo';
+    protected $pk = 'UI_Id';
 
 
-    public function user()
+    public function schoolAction()
     {
-        return $this->hasOne('UsersModel','II_AddUId','UI_Id');
+        return $this->belongsTo('SchoolsModel','UI_SchoolId','S_Id');
     }
 }
