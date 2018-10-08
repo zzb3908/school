@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>学校管理-象牙塔</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{:config('static_dir')}layui/css/layui.css?_v={:config('static_ver')}" media="all" />
+    <link rel="stylesheet" href="{:config('static_dir')}css/public.css?_v={:config('static_ver')}" media="all" />
+    <style type="text/css">
+        /*.layer-photos-demo img {
+            margin: 10px 10px 10px 10px;
+        }*/
+        .item {
+            position: relative;
+            float: left;
+            max-width: 200px;
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+        .img {
+            zoom: 1;
+        }
+        .img img{
+            max-width: 200px;
+            padding: 3px;
+            border: 1px #e6e6e6 solid;
+        }
+        .img .shequ-fc {
+            /*background: url({:config('static_dir')}images/trip_s.png) repeat-x 0 0;*/
+            height: 27px;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            bottom: 1px;
+            color: white;
+            line-height: 27px;
+            padding: 3px;
+        }
+        .img .shequ-fc a {
+            color: #fff;
+        }
+        .img .b3 {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="childrenBody">
+    <form class="layui-form layui-row layui-col-space10" id="formData">
+        <input type="hidden" name="id" value="{$detail.S_Id}" />
+        <div class="layui-col-md12 layui-col-xs12">
+                    
+            <div class="layui-form-item layui-row layui-col-xs12 magt3">
+                <label class="layui-form-label">学校名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="S_Name" value="{$detail.S_Name}" class="layui-input" placeholder="请输入学校名称" lay-verify="sName" />
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">助记码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="S_ZJM" value="{$detail.S_ZJM}" class="layui-input" lay-verify="sZJM" placeholder="请输入学校名称首字母">
+                </div>
+            </div>
+
+            <!-- <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">学校Logo</label>
+                <div class="layui-col-md2 layui-upload-list thumbBox mag0 magt3">
+                    <img class="layui-upload-img thumbImg">
+                </div>
+            </div> -->
+            
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">学校Logo</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn" id="btnupload_img">
+                        <i class="layui-icon"></i>上传Logo
+                    </button>
+                    <div class="layer-photos-demo" id="pics">
+                        {notempty name="detail.S_Logo"}
+                        <div class="item">
+                            <div class="img" style="margin-top: 1px;">
+                                <div class="b3">
+                                    <img src="{:config('file_host')}{$detail.S_Logo}">
+                                    <div class="shequ-fc" onclick="delImage(this)"><a href="javascript:;">删除</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/notempty} 
+                    </div>
+                    <input type="hidden" name="S_Logo" value="{$detail.S_Logo}" />
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">所在地区</label>
+                <div class="layui-input-inline">
+                    <select name="S_ProvId" lay-filter="province">
+                        <option value="">选择省份</option>
+                        {volist name="$arealist" id="vo"}
+                        <option value="{$vo.AI_Id}" {in name="$vo.AI_Id" value="$detail.S_ProvId"}selected{/in}>{$vo.AI_Name}</option>
+                        {/volist}
+                    </select>
+                    <input type="hidden" name="S_ProvName" value="{$detail.S_ProvName}" />
+                </div>
+                <div class="layui-input-inline">
+                    <select name="S_CityId" lay-filter="city" id="citySelect">
+                        <option value="">选择城市</option>
+                        {volist name="$citylist" id="vo"}
+                        <option value="{$vo.AI_Id}" {in name="$vo.AI_Id" value="$detail.S_CityId"}selected{/in}>{$vo.AI_Name}</option>
+                        {/volist}
+                    </select>
+                    <input type="hidden" name="S_CityName" value="{$detail.S_CityName}" />
+                </div>
+                
+            </div>
+
+            <hr class="layui-bg-gray" />
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label"></label>
+                <div class="layui-left">
+                    <a class="layui-btn layui-btn" lay-filter="add" lay-submit><i class="layui-icon">&#xe609;</i>发布</a>
+                </div>
+            </div>
+
+        </div>
+        
+    </form>
+<script type="text/javascript" src="{:config('static_dir')}layui/layui.all.js?_v={:config('static_ver')}"></script>
+<script type="text/javascript">
+layui.config({
+    base: "{:config('static_dir')}js/"    //此处写的相对路径, 实际以项目中的路径为准
+}).extend({
+    formSelects: 'formSelects-v3'
+});
+layui.use(['jquery','form','layer','layedit','laydate','upload','formSelects'],function(){
+    var form = layui.form
+        // layer = parent.layer === undefined ? layui.layer : top.layer,
+        layer = layui.layer,
+        laypage = layui.laypage,
+        upload = layui.upload,
+        layedit = layui.layedit,
+        laydate = layui.laydate,
+        $ = layui.jquery,
+        formSelects = layui.formSelects;
+
+    //上传图片
+    upload.render({
+        elem: '#btnupload_img',
+        url: "{:config('api_host')}storage/upload",
+        multiple: false,
+        accept: 'images',
+        data: {module:"schools", type:"images"},
+        before: function (obj) {
+            var index = layer.msg('上传中...请稍候',{icon: 16,time:false,shade:0.6});
+            //预读本地文件示例，不支持ie8
+            obj.preview(function (index, file, result) {
+               $('#pics').html('<div class="item"><div class="img" style="margin-top: 1px;"><div class="b3"><img src="' + result + '" alt="' + file.name + '" class="layui-upload-img"></div></div>')
+            });
+        },
+        done: function (res) {
+            if (res.Code == 200) {
+                //上传完毕
+                $('#pics').html('<div class="item"><div class="img" style="margin-top: 1px;"><div class="b3"><img src="' + res.Data.url
+                    + '"><div class="shequ-fc" onclick="delImage(this)"><a href="javascript:;" >删除</a></div></div></div>');
+ 
+                $("input[name=S_Logo]").val(res.Data.name);
+                layer.closeAll();
+                layer.msg(res.Msg);
+            }else{
+                layer.msg(res.Msg);
+            }
+        }
+    });
+
+    //验证
+    form.verify({
+        sName : function(val, obj){
+            if(val == '') return "学校名称必须填写！";
+        }
+    })
+
+    //提交
+    form.on("submit(add)",function(data){
+        //弹出loading
+        var index = layer.msg('数据提交中，请稍候',{icon: 16,time:false,shade:0.6});
+
+        //提交数据
+        $.post("edit",$("#formData").serializeArray(),function(res){
+            if (res.status == 1) {
+                setTimeout(function(){
+                    layer.close(index);
+                    layer.msg(res.msg);
+                    layer.closeAll("iframe");
+                    //刷新父页面
+                    parent.location.reload();
+                },500);
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+        return false;
+    });
+
+    form.on('select(province)', function(data){
+        // console.log(data.elem); //得到select原始DOM对象
+        // console.log(data.value); //得到被选中的值
+        // console.log(data.othis); //得到美化后的DOM对象
+
+        //获取选中的省份名称
+        $("input[name=S_ProvName]").val($(data.elem).find('option:selected').text());
+        //更换省份后清除城市
+        $("input[name=S_CityName]").val("");
+
+        //提交数据
+        $.post("../ajax/getCity",{spid: data.value},function(res){
+            if (res.status == 1) {
+                $("#citySelect").html(res.data);
+                form.render('select');
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+    });
+    form.on('select(city)', function(data){
+        //获取选中的省份名称
+        $("input[name=S_CityName]").val($(data.elem).find('option:selected').text());
+    });
+ 
+    $('input[name=S_Name]').bind('keyup', function() {  
+        // console.log($(this).val());
+        $.post("../ajax/getZjm",{keyword: $(this).val()},function(res){
+            if (res.status == 1) {
+                $("input[name=S_ZJM]").val(res.data);
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+    });
+
+});
+
+function delImage(obj){
+    $(obj).parent().parent().parent().remove();
+    var url = '';
+    $("#pics .item img").each(function(index, el) {
+        url = url!='' ? url + '|' + $(this).attr('src') : $(this).attr('src');
+    });
+    $("input[name=S_Logo]").val(url);
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>标签管理-象牙塔</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{:config('static_dir')}layui/css/layui.css?_v={:config('static_ver')}" media="all" />
+    <link rel="stylesheet" href="{:config('static_dir')}css/public.css?_v={:config('static_ver')}" media="all" />
+</head>
+<body class="childrenBody">
+    <form class="layui-form">
+        <blockquote class="layui-elem-quote quoteBox">
+            <form class="layui-form">
+                <div class="layui-inline">
+                    <a class="layui-btn layui-btn-normal add_btn" data-pid="{$detail.S_Id}">添加标签</a>
+                </div>
+                <div class="layui-inline" style="margin-right:10px">
+                    <a class="layui-btn layui-btn-danger layui-btn-normal delAll_btn">批量删除</a>
+                </div>
+                <div class="layui-inline">
+                <select name="T_Module" lay-filter="province">
+                    <option value="">选择模块</option>
+                    {volist name=":config('module_type')" id="vo"}
+                    <option value="{$vo.id}" {in name="$vo.id" value="$param.T_Module"}selected{/in}>{$vo.name}</option>
+                    {/volist}
+                </select>
+            </div>
+                <div class="layui-inline">
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input searchVal" placeholder="请输入搜索的内容" />
+                    </div>
+                    <a class="layui-btn search_btn" data-type="reload">搜索</a>
+                </div>
+            </form>
+            <span class="layui-word-aux">小提示：名称、助记码、排序 点击单元格可修改数据</span>
+        </blockquote>
+        <table id="list" lay-filter="list"></table>
+
+        <!--操作-->
+        <script type="text/html" id="listBar">
+            <a class="layui-btn layui-btn-xs layui-bg-blue" lay-event="edit"><i class="layui-icon layui-icon-edit">&#xe642;</i>编辑 </a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del"><i class="layui-icon layui-icon-edit">&#xe640;</i>删除 </a>
+        </script>
+    </form>
+<script type="text/javascript" src="{:config('static_dir')}layui/layui.all.js?_v={:config('static_ver')}"></script>
+<script type="text/javascript" src="{:config('static_dir')}js/my.js?_v={:config('static_ver')}"></script>
+<script type="text/javascript">
+
+layui.config({
+    base: "{:config('static_dir')}js/"    //此处写的相对路径, 实际以项目中的路径为准
+});
+layui.use(['jquery','form','layer','laydate','table','laytpl'],function(){
+    var form = layui.form,
+        // layer = parent.layer === undefined ? layui.layer : top.layer,
+        layer = layui.layer,
+        $ = layui.jquery,
+        laydate = layui.laydate,
+        laytpl = layui.laytpl,
+        table = layui.table;
+
+    //列表
+    var tableIns = table.render({
+        elem: '#list',
+        url : 'list',
+        cellMinWidth : 95,
+        page : true,
+        height : "full-125",
+        limit : 20,
+        limits : [10,15,20,30],
+        id : "listTable",
+        cols : [[
+            {type: "checkbox", fixed:"left", width:50},
+            {field: 'T_Id', title: 'ID', width:80, align:"center", sort:true},
+            {field: 'T_Name', title: '名称', align:"left", edit: 'text'},
+            {field: 'T_ZJM', title: '助记码', edit: 'text'},
+            {field: 'T_ModuleName', title: '模块'},
+            {field: 'T_Sort', title: '排序', edit: 'text', sort:true},
+            {field: 'T_AddIP', title: '添加IP'},
+            {field: 'T_AddTime', title: '添加时间', align:'center', minWidth:100, sort:true, templet:function(d){
+                var myDate = new Date(d.T_AddTime*1000);
+                return myDate.format('yyyy-MM-dd hh:mm');
+            }},
+            {title: '操作', width:150, templet:'#listBar',fixed:"right",align:"center"}
+        ]]
+        // ,done: function(res, curr, count){
+        //     $("body.childrenBody .layui-table-body table>tbody>tr>td").each(function(index, el) {
+        //         if ($(this).data('field') == 'T_Id') {
+        //             tag_id = $(this).find('div').text();
+        //         }
+
+        //         if ($(this).data('field') == 'T_Module') {
+        //             var typeId = $(this).find('div').text();
+
+        //             var html = '<select name="type" style="display:block" onchange="changeModule(this,'+tag_id+')"><option>选择模块</option>';
+        //             $.each(res.module_type, function(index, val) {
+        //                 var selected = typeId == val.id ? 'selected' : '';
+        //                 html += '<option value="'+val.id+'" '+selected+'>'+val.name+'</option>';
+        //             });
+        //             html += '</select>';
+        //             $(this).find('div').html(html)
+        //         }
+        //     });
+        // }
+    });
+
+    //搜索【此功能需要后台配合，所以暂时没有动态效果演示】
+    $(".search_btn").on("click",function(){
+        table.reload("listTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+                T_Name: $(".searchVal").val(),  //搜索的关键字
+                T_Module: $("select[name=T_Module] option:selected").val(),
+            }
+        })
+    });
+
+    //新增标签
+    $(".add_btn").click(function(){
+        $.post("edit",{pid: $(this).data('pid')},function(res){
+            if (res.status == 1) {
+                layer.msg(res.msg);
+                table.reload("listTable",{page: {curr: 1}});
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+    });
+
+    //批量删除
+    $(".delAll_btn").click(function(){
+        var checkStatus = table.checkStatus('listTable'),
+            data = checkStatus.data,
+            ids = [];
+        if(data.length > 0) {
+            for (var i in data) {
+                ids.push(data[i].T_Id);
+            }
+            layer.confirm('确定删除选中的标签？', {icon: 3, title: '提示信息'}, function (index) {
+                $.post("delete",{
+                    ids : ids  //将需要删除的newsId作为参数传入
+                },function(res){
+                    if (res.status==1) {
+                        // tableIns.reload();
+                        table.reload("listTable");
+                        layer.close(index);
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                })
+            })
+        }else{
+            layer.msg("请选择需要删除的标签");
+        }
+    });
+
+    //添加标签
+    function addData(data){
+        var url = 'edit'; title = '添加标签';
+        if (data) {
+            url = 'edit?id=' + data.T_Id;
+            title = '编辑标签';
+        }
+        var index = layui.layer.open({
+            title : title,
+            type : 2,
+            area : ['500px','45%'],
+            content : url,
+            success : function(layero, index){
+                setTimeout(function(){
+                    layui.layer.tips('点击此处返回标签列表', '.layui-layer-setwin .layui-layer-close', {
+                        tips: 3
+                    });
+                },500)
+            }
+        })
+        // layui.layer.full(index);
+        //改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
+        // $(window).on("resize",function(){
+        //     layui.layer.full(index);
+        // })
+    }
+
+    //列表操作
+    table.on('tool(list)', function(obj){
+        var layEvent = obj.event,
+            data = obj.data;
+
+        if(layEvent === 'del'){ //删除
+            layer.confirm('确定删除 '+data.T_Name+' 此标签？',{icon:3, title:'提示信息'},function(index){
+                $.post("delete",{
+                    ids : [data.T_Id]  //将需要删除的newsId作为参数传入
+                },function(res){
+                    if (res.status==1) {
+                        // tableIns.reload();
+                        table.reload("listTable");
+                        layer.close(index);
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                })
+            });
+        }else if(layEvent === 'edit'){ //编辑
+            addData(data);
+        }
+    });
+
+    //控制表格编辑时文本的位置【跟随渲染时的位置】
+    $("body").on("click",".layui-table-body.layui-table-main tbody tr td",function(){
+        $(this).find(".layui-table-edit").addClass("layui-"+$(this).attr("align"));
+    });
+
+    table.on('edit(list)', function(obj){ //注：edit是固定事件名，test是table原始容器的属性 lay-filter="对应的值"
+        // console.log(obj.value); //得到修改后的值
+        // console.log(obj.field); //当前编辑的字段名
+        // console.log(obj.data); //所在行的所有相关数据
+
+        //提交数据
+        $.post("act",{id: obj.data.T_Id, field: obj.field, value: obj.value},function(res){
+            if (res.status == 1) {
+                layer.msg(res.msg);
+            }else{
+                layer.msg(res.msg);
+            }
+        })  
+    });
+
+    //排序
+    table.on('sort(list)', function(obj){
+        table.reload('listTable', {
+            initSort: obj,
+            where: {
+                orderField: obj.field, 
+                orderType: obj.type,
+            }
+        });
+    });
+
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>资讯添加-象牙塔</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{:config('static_dir')}layui/css/layui.css?_v={:config('static_ver')}" media="all" />
+    <link rel="stylesheet" href="{:config('static_dir')}css/public.css?_v={:config('static_ver')}" media="all" />
+    <style type="text/css">
+        /*.layer-photos-demo img {
+            margin: 10px 10px 10px 10px;
+        }*/
+        .item {
+            /*position: relative;*/
+            float: left;
+            width: 120px;
+            height: 120px;
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+
+        .img {
+            zoom: 1;
+        }
+
+            .img .shequ-fc {
+                /*background: url({:config('static_dir')}images/trip_s.png) repeat-x 0 0;*/
+                height: 27px;
+                width: 120px;
+                text-align: center;
+                position: absolute;
+                bottom: 1px;
+                color: white;
+                line-height: 27px;
+            }
+
+                .img .shequ-fc a {
+                    color: #fff;
+                }
+
+            .img .b3 {
+                position: relative;
+            }
+    </style>
+</head>
+<body class="childrenBody">
+    <form class="layui-form layui-row layui-col-space10" id="formData">
+        <input type="hidden" name="id" value="{$detail.NI_Id}" />
+        <div class="layui-col-md9 layui-col-xs12">
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md12 layui-col-xs7">
+                    <div class="layui-form-item magt3">
+                        <label class="layui-form-label">资讯模块</label>
+                        <div class="layui-input-block" lay-verify="newsModule">
+                            <!-- 类型：101综合，102校际，103校内，104研学，105看板 -->
+                            <?php foreach(module_type(100) as $key=>$value){ if($value['id']=='105') continue;?>
+                            <input type="radio" name="NI_Module" value="{$value['id']}" title="{$value['name']}" lay-skin="primary" {if condition="$detail.NI_Module eq $value['id']"}checked{/if} />
+                            <?php }?>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item magt3">
+                        <label class="layui-form-label">资讯标题</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="NI_Title" value="{$detail.NI_Title}" class="layui-input" placeholder="请输入资讯标题" lay-verify="newsTitle" />
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">资讯副标题</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="NI_SubTitle" value="{$detail.NI_SubTitle}" class="layui-input" lay-verify="newsSubTitle" placeholder="请输入资讯副标题">
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="layui-col-md3 layui-col-xs5">
+                    <div class="layui-upload-list thumbBox mag0 magt3">
+                        <img class="layui-upload-img thumbImg">
+                    </div>
+                </div>-->
+            </div>
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">内容摘要</label>
+                <div class="layui-input-block">
+                    <textarea name="NI_Summary" placeholder="请输入内容摘要" class="layui-textarea abstract">{$detail.NI_Summary}</textarea>
+                </div>
+
+            </div>
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">资讯标签</label>
+                <div class="layui-input-block">
+                    <select xm-select="tags" xm-select-type="2"><!-- multiple name="NI_Tags[]" -->
+                        <option value="">请选择资讯标签</option>
+                        {volist name="$taglist" id="vo"}
+                        <option value="{$vo.T_Name}" {in name="$vo.T_Name" value="$detail.NI_Tags"}selected{/in}>{$vo.T_Name}</option>
+                        {/volist}
+                    </select>
+                    <input type="hidden" name="NI_Tags" value="{$detail.NI_Tags}" />
+                </div>
+            </div>
+            <div class="layui-form-item layui-row layui-col-xs12">
+                <label class="layui-form-label">资讯类型</label>
+                <div class="layui-col-xs4" lay-verify="newsType">
+                    <input type="radio" name="NI_Type" value="1" title="图文" lay-filter="news_type" lay-skin="primary" {if condition="($detail.NI_Type eq 1) or (!$detail.NI_Type)"}checked{/if} />
+                    <input type="radio" name="NI_Type" value="2" title="视频" lay-filter="news_type" lay-skin="primary" {if condition="$detail.NI_Type eq 2"}checked{/if} />
+                </div>
+               
+            </div>
+            <div class="layui-form-item layui-row layui-col-xs12 div_pic {if condition="$detail.NI_Type eq 2"}layui-hide{/if}">
+                <label class="layui-form-label">图片集</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn" id="btnupload_img">
+                        <i class="layui-icon"></i>上传图片集
+                    </button>
+                    <div class="layer-photos-demo" id="pics">
+                        {volist name="attach_list" id="vo"}
+                        {notempty name="vo"}
+                        <div class="item">
+                            <div class="img" style="margin-top: 1px;">
+                                <div class="b3">
+                                    <img src="{:config('upload_host')}{$vo.A_AttachPath}" width="120" height="120" data-ids="{$vo.A_Id}"><div class="shequ-fc" onclick="delImage(this)"><a href="javascript:;">删除</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/notempty}
+                        {/volist}   
+                    </div>
+                    <input type="hidden" name="attachIds" value="{$detail.attachIds}" />
+                </div>
+            </div>
+            <div class="layui-row div_video {if condition="($detail.NI_Type eq 1) or (!$detail.NI_Type)"}layui-hide{/if}">
+                <div class="magb15 layui-col-md3 layui-col-xs12">
+                    <label class="layui-form-label">视频文件</label>
+                    <div class="layui-col-md5 layui-col-xs5">
+                        <button type="button" class="layui-btn" id="btnupload_video"><i class="layui-icon"></i>上传视频</button>
+                    </div>
+                </div>
+                <div class="magb15 layui-col-md5 layui-col-xs12">
+                    <label class="layui-form-label">文件位置</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="attachPath" value="{:config('upload_host')}{$detail.attachPath}" readonly class="layui-input bm_path layui-readonly" />
+                        <input type="hidden" name="NI_VideoUrl" value="{$detail.NI_VideoUrl}" />
+                    </div>
+                </div>
+                <div class="magb15 layui-col-md2 layui-col-xs12" style="text-align:center">
+                    <button type="button" class="layui-btn" id="btnplay">播放</button>
+                </div>
+            </div>
+           
+            <div class="layui-form-item layui-row layui-col-xs12" style="text-align:right; display:none">
+                <button type="button" class="layui-btn" id="btn_getimg">↓ 获取资讯内图片设置图片集</button>
+            </div>
+
+            <div class="layui-form-item layui-row layui-col-xs12">
+
+                <label class="layui-form-label">地区院校</label>
+                <div class="layui-input-inline">
+                    <select name="NI_ProvCode" lay-search lay-filter="area">
+                        <option value="">选择地区</option>
+                        {volist name="$arealist" id="vo"}
+                        <option value="{$vo.AI_Id}" {in name="$vo.AI_Id" value="$detail.NI_ProvCode"}selected{/in}>{$vo.AI_Name}</option>
+                        {/volist}
+                    </select>
+                    <input type="hidden" name="NI_ProvName" value="{$detail.NI_ProvName}" />
+                </div>
+                <div class="layui-inline" style="width:40%">
+                    <select xm-select="schools" xm-select-type="2" xm-select-search id="schoolsSelect"><!-- multiple -->
+                        <option value="">选择学校</option>
+                        {volist name="$schoolslist" id="vo"}
+                        <option value="{$vo.S_Id}" {in name="$vo.S_Id" value="$detail.NI_SchoolIds"}selected{/in}>{$vo.S_Name}</option>
+                        {/volist}
+                    </select>
+                    <input type="hidden" name="NI_SchoolIds" value="{$detail.NI_SchoolIds}" />
+                    <input type="hidden" name="NI_SchoolNames" value="{$detail.NI_SchoolNames}" />
+                </div>
+                
+            </div>
+
+            <div class="layui-form-item magb0">
+                <label class="layui-form-label">资讯内容</label>
+                <div class="layui-input-block">
+                    <textarea class="layui-textarea layui-hide" name="NI_Content" lay-verify="newsContent" id="news_content">{$detail.NI_Content}</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md3 layui-col-xs12">
+            <blockquote class="layui-elem-quote title"><i class="seraph icon-caidan"></i> 用户操作数据</blockquote>
+            <div class="border category">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><i class="layui-icon">&#xe60e;</i> 评论数</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="NI_CommentCount" class="layui-input" style="color:#0094ff" id="pinglun_num" placeholder="评论数" value="{$detail.NI_CommentCount}" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><i class="layui-icon">&#xe60e;</i> 点赞数</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="NI_LikeCount" class="layui-input" style="color:#ee5e5e" id="dianzan_num" placeholder="点赞数" value="{$detail.NI_LikeCount}" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><i class="layui-icon">&#xe60e;</i> 收藏数</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="NI_CollectionCount" class="layui-input" style="color:#ff006e" id="shoucan_num" placeholder="收藏数" value="{$detail.NI_CollectionCount}" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><i class="layui-icon">&#xe60e;</i> 分享数</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="NI_ShareCount" class="layui-input" style="color:#3c62e0" id="fangxiang_num" placeholder="分享数" value="{$detail.NI_ShareCount}" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><i class="layui-icon">&#xe60e;</i> 举报数</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="NI_ReportCount" class="layui-input" style="color:#ff0000" id="jubao_num" placeholder="举报数" value="{$detail.NI_ReportCount}" />
+                    </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote title magt10"><i class="layui-icon">&#xe609;</i> 发布</blockquote>
+            <div class="border">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><i class="layui-icon">&#xe60e;</i>状　态</label>
+                    <div class="layui-input-block newsStatus">
+                        <select name="NI_Status" lay-verify="">
+                            <option value="0" {if condition="$detail.NI_Status eq '0'"}selected{/if}>保存草稿</option>
+                            <option value="1" {if condition="$detail.NI_Status eq '1'"}selected{/if}>等待审核</option>
+                            <option value="2" {if condition="$detail.NI_Status eq '2'"}selected{/if}>通过审核</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- <div class="layui-form-item">
+                    <label class="layui-form-label"><i class="layui-icon">&#xe609;</i>发　布</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="release" title="立即发布" lay-skin="primary" lay-filter="release" checked />
+                        <input type="radio" name="release" title="定时发布" lay-skin="primary" lay-filter="release" />
+                    </div>
+                </div>
+                <div class="layui-form-item layui-hide releaseDate">
+                    <label class="layui-form-label"></label>
+                    <div class="layui-input-block">
+                        <input type="text" class="layui-input" id="release" placeholder="请选择日期和时间" readonly />
+                    </div>
+                </div>
+                <div class="layui-form-item openness">
+                    <label class="layui-form-label"><i class="seraph icon-look"></i> 公开度</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="openness" title="开放浏览" lay-skin="primary" checked />
+                        <input type="radio" name="openness" title="私密浏览" lay-skin="primary" />
+                    </div>
+                </div> -->
+                <div class="layui-form-item news_Open">
+                    <label class="layui-form-label"><i class="seraph icon-text"></i>大　图</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="NI_IsBigPicture" lay-skin="switch" lay-text="是|否" {if condition="$detail.NI_IsBigPicture eq '1'"}checked{/if}>
+                    </div>
+                </div>
+                <div class="layui-form-item news_Open">
+                    <label class="layui-form-label"><i class="seraph icon-text"></i>评　论</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="NI_CommentIsOpen" lay-skin="switch" lay-text="开|关" {if condition="$detail.NI_CommentIsOpen eq '1'"}checked{/if}>
+                    </div>
+                </div>
+                <div class="layui-form-item newsTop">
+                    <label class="layui-form-label"><i class="seraph icon-zhiding"></i>推　荐</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="NI_IsRecommendIndex" lay-skin="switch" lay-text="是|否" {if condition="$detail.NI_IsRecommendIndex eq '1'"}checked{/if}>
+                    </div>
+                </div>
+                <hr class="layui-bg-gray" />
+                <div class="layui-right">
+                    <a class="layui-btn layui-btn-sm" lay-filter="addNews" lay-submit><i class="layui-icon">&#xe609;</i>发布</a>
+                    <a class="layui-btn layui-btn-primary layui-btn-sm" lay-filter="look" lay-submit>预览</a>
+                </div>
+            </div>
+
+
+        </div>
+    </form>
+<script type="text/javascript" src="{:config('static_dir')}layui/layui.all.js?_v={:config('static_ver')}"></script>
+<script type="text/javascript">
+layui.config({
+    base: "{:config('static_dir')}js/"    //此处写的相对路径, 实际以项目中的路径为准
+}).extend({
+    formSelects: 'formSelects-v3'
+});
+layui.use(['jquery','form','layer','layedit','laydate','upload','formSelects'],function(){
+    var form = layui.form
+        // layer = parent.layer === undefined ? layui.layer : top.layer,
+        layer = layui.layer,
+        laypage = layui.laypage,
+        upload = layui.upload,
+        layedit = layui.layedit,
+        laydate = layui.laydate,
+        $ = layui.jquery,
+        formSelects = layui.formSelects;
+
+    //用于同步编辑器内容到textarea
+    layedit.sync(editIndex);
+
+    //上传图片
+    upload.render({
+        elem: '#btnupload_img',
+        url: "{:config('api_host')}storage/upload",
+        multiple: true,
+        accept: 'images',
+        data: {
+            module:"news", 
+            type:"images",
+            backend:1
+        },
+        before: function (obj) {
+            var index = layer.msg('上传中...请稍候',{icon: 16,time:false,shade:0.6});
+            //预读本地文件示例，不支持ie8
+            /*obj.preview(function (index, file, result) {
+               $('#pics').append('<img src="' + result + '" alt="' + file.name + '" class="layui-upload-img" width="100px" height="100px">')
+            });*/
+        },
+        done: function (res) {
+            if (res.Code == 200) {
+                //上传完毕
+                $('#pics').append('<div class="item"><div class="img" style="margin-top: 1px;"><div class="b3"><img src="' + res.Data.url
+                    + '" width="120" height="120" data-aid="' + res.Data.id + '"><div class="shequ-fc" onclick="delImage(this)"><a href="javascript:;" >删除</a></div></div></div>');
+                var aid = $("input[name=attachIds]").val();
+                aid = aid!='' ? aid + ',' + res.Data.id : res.Data.id;
+                $("input[name=attachIds]").val(aid);
+                $("input[name=NI_VideoUrl]").val(res.Data.screenshot);
+                layer.closeAll();
+                layer.msg(res.Msg);
+            }else{
+                layer.msg(res.Msg);
+            }
+        }
+    });
+
+    //上传视频
+    upload.render({
+        elem: '#btnupload_video',
+        url: "{:config('api_host')}storage/upload",
+        multiple: false,
+        accept: 'video',
+        data: {
+            module:"news", 
+            type:"video",
+            backend:1
+        },
+        before: function (obj) {
+            var index = layer.msg('上传中...请稍候',{icon: 16,time:false,shade:0.6});
+        },
+        done: function (res) {
+            if (res.Code == 200) {
+                //上传完毕
+                $("input[name=attachIds]").val(res.Data.id);
+                $("#attachPath").val(res.Data.url);
+                $("input[name=NI_VideoUrl]").val(res.Data.screenshot);
+                layer.closeAll();
+                layer.msg(res.Msg);
+            }else{
+                layer.msg(res.Msg);
+            }
+        }
+    });
+
+    //格式化时间
+    function filterTime(val){
+        if(val < 10){
+            return "0" + val;
+        }else{
+            return val;
+        }
+    }
+    //定时发布
+    var time = new Date();
+    var submitTime = time.getFullYear()+'-'+filterTime(time.getMonth()+1)+'-'+filterTime(time.getDate())+' '+filterTime(time.getHours())+':'+filterTime(time.getMinutes())+':'+filterTime(time.getSeconds());
+    laydate.render({
+        elem: '#release',
+        type: 'datetime',
+        trigger : "click",
+        done : function(value, date, endDate){
+            submitTime = value;
+        }
+    });
+    form.on("radio(release)",function(data){
+        if(data.elem.title == "定时发布"){
+            $(".releaseDate").removeClass("layui-hide");
+            $(".releaseDate #release").attr("lay-verify","required");
+        }else{
+            $(".releaseDate").addClass("layui-hide");
+            $(".releaseDate #release").removeAttr("lay-verify");
+            submitTime = time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate()+' '+time.getHours()+':'+time.getMinutes()+':'+time.getSeconds();
+        }
+    });
+
+    form.on("radio(news_type)", function (data) {
+        if (data.elem.title == "视频") {
+            $(".div_video").removeClass("layui-hide");
+            $(".div_pic").addClass("layui-hide");
+        } else {
+            $(".div_video").addClass("layui-hide");
+            $(".div_pic").removeClass("layui-hide");
+        }
+    });
+
+    //验证
+    form.verify({
+        newsModule : function(val, obj){
+            var checked = false;
+            $(obj).find('input').each(function(index, eml) {
+                if (eml.checked===true) checked=true;
+            });
+            if(checked === false) return "资讯模块必须选择";
+        },
+        newsTitle : function(val){
+            if(val == '') return "资讯标题不能为空";
+        },
+        newsType : function(val, obj){
+            var checked = false;
+            $(obj).find('input').each(function(index, eml) {
+                if (eml.checked===true) checked=true;
+            });
+            if(checked === false) return "资讯类型必须选择";
+        },
+        newsContent : function(val, obj){
+            if(layedit.getText(editIndex) == '') return "资讯内容不能为空";
+            $(obj).text(layedit.getContent(editIndex));
+        }
+    })
+
+    //提交
+    form.on("submit(addNews)",function(data){
+        //截取文章内容中的一部分文字放入文章摘要
+        var abstract = layedit.getText(editIndex).substring(0,50);
+        //弹出loading
+        var index = layer.msg('数据提交中，请稍候',{icon: 16,time:false,shade:0.6});
+
+        //多选标签赋值
+        $("input[name=NI_Tags]").val(formSelects.value('tags','valStr'));
+
+        //多选学校
+        $("input[name=NI_SchoolIds]").val(formSelects.value('schools','valStr'));
+        $("input[name=NI_SchoolNames]").val(formSelects.value('schools','name'));
+
+        //提交数据
+        $.post("edit",$("#formData").serializeArray(),function(res){
+            if (res.status == 1) {
+                setTimeout(function(){
+                    layer.close(index);
+                    layer.msg(res.msg);
+                    layer.closeAll("iframe");
+                    //刷新父页面
+                    parent.location.reload();
+                },500);
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+        return false;
+    })
+
+    //预览
+    form.on("submit(look)",function(){
+        layer.alert("此功能需要前台展示，实际开发中传入对应的必要参数进行文章内容页面访问");
+        return false;
+    })
+
+    //创建一个编辑器
+    var editIndex = layedit.build('news_content',{
+        height : 435,
+        uploadImage : {
+            url : "{:config('api_host')}storage/editorUpload?type=images&module=news"
+        }
+    });
+
+    $("#btnplay").on("click", function () {
+        open_video($("#attachPath").val());
+    });
+
+    function open_video(url) {
+        //iframe层-多媒体
+        layer.open({
+            type: 2,
+            title: false,
+            area: ['630px', '360px'],
+            shade: 0.8,
+            closeBtn: 0,
+            shadeClose: true,
+            content: url
+        });
+    };
+
+    form.on('select(area)', function(data){
+        // console.log(data.elem); //得到select原始DOM对象
+        // console.log(data.value); //得到被选中的值
+        // console.log(data.othis); //得到美化后的DOM对象
+
+        var sid = formSelects.value('schools','valStr');
+
+        //获取选中的省份名称
+        $("input[name=NI_ProvName]").val($(data.elem).find('option:selected').text());
+
+        //提交数据
+        $.post("../ajax/getSchools",{spid: data.value, sid: sid},function(res){
+            if (res.status == 1) {
+                $("#schoolsSelect").html(res.data);
+                // form.render('select','area');
+                formSelects.render({name:'schools'});
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+    }); 
+
+});
+
+function delImage(obj){
+    $(obj).parent().parent().parent().remove();
+    var ids = '';
+    $("#pics .item img").each(function(index, el) {
+        ids = ids!='' ? ids + ',' + $(this).data('ids') : $(this).data('ids');
+    });
+    $("input[name=attachIds]").val(ids);
+}
+
+</script>
+</body>
+</html>

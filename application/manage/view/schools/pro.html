@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>学校管理-象牙塔</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{:config('static_dir')}layui/css/layui.css?_v={:config('static_ver')}" media="all" />
+    <link rel="stylesheet" href="{:config('static_dir')}css/public.css?_v={:config('static_ver')}" media="all" />
+</head>
+<body class="childrenBody">
+    <form class="layui-form">
+        <blockquote class="layui-elem-quote quoteBox">
+            <form class="layui-form">
+                <div class="layui-inline">
+                    <a class="layui-btn layui-btn-normal add_btn" data-pid="{$detail.S_Id}">添加专业(系)</a>
+                </div>
+                <div class="layui-inline" style="margin-right:10px">
+                    <a class="layui-btn layui-btn-danger layui-btn-normal delAll_btn">批量删除</a>
+                </div>
+                <div class="layui-inline">
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input searchVal" placeholder="请输入搜索的内容" />
+                    </div>
+                    <a class="layui-btn search_btn" data-type="reload">搜索</a>
+                </div>
+            </form>
+            <span class="layui-word-aux">小提示：专业(系)名称、助记码 点击单元格可修改数据</span>
+        </blockquote>
+        <table id="list" lay-filter="list"></table>
+
+        <!--操作-->
+        <script type="text/html" id="listBar">
+            <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+        </script>
+    </form>
+<script type="text/javascript" src="{:config('static_dir')}layui/layui.all.js?_v={:config('static_ver')}"></script>
+<script type="text/javascript">
+layui.config({
+    base: "{:config('static_dir')}js/"    //此处写的相对路径, 实际以项目中的路径为准
+});
+layui.use(['jquery','form','layer','laydate','table','laytpl'],function(){
+    var form = layui.form,
+        // layer = parent.layer === undefined ? layui.layer : top.layer,
+        layer = layui.layer,
+        $ = layui.jquery,
+        laydate = layui.laydate,
+        laytpl = layui.laytpl,
+        table = layui.table;
+
+    //列表
+    var tableIns = table.render({
+        elem: '#list',
+        url : 'prolist',
+        where: {SP_PId: "{$detail.S_Id}"},
+        cellMinWidth : 95,
+        page : true,
+        height : "full-125",
+        limit : 20,
+        limits : [10,15,20,30],
+        id : "listTable",
+        cols : [[
+            {type: "checkbox", fixed:"left", width:50},
+            {field: 'SP_Id', title: 'ID', width:120, align:"center"},
+            {field: 'SP_Name', title: '专业(系)名称', align:"left", edit: 'text'},
+            {field: 'SP_ZJM', title: '助记码', edit: 'text'},
+            {field: 'SP_PName', title: '所属学校'},
+            {title: '操作', width:100, templet:'#listBar',fixed:"right",align:"center"}
+        ]]
+    });
+
+    //搜索【此功能需要后台配合，所以暂时没有动态效果演示】
+    $(".search_btn").on("click",function(){
+        table.reload("listTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+                SP_Name: $(".searchVal").val()  //搜索的关键字
+            }
+        })
+    });
+
+    //新增专业
+    $(".add_btn").click(function(){
+        $.post("proedit",{pid: $(this).data('pid')},function(res){
+            if (res.status == 1) {
+                layer.msg(res.msg);
+                table.reload("listTable",{page: {curr: 1}});
+            }else{
+                layer.msg(res.msg);
+            }
+        })
+    });
+
+    //批量删除
+    $(".delAll_btn").click(function(){
+        var checkStatus = table.checkStatus('listTable'),
+            data = checkStatus.data,
+            ids = [];
+        if(data.length > 0) {
+            for (var i in data) {
+                ids.push(data[i].SP_Id);
+            }
+            layer.confirm('确定删除选中的专业？', {icon: 3, title: '提示信息'}, function (index) {
+                $.post("prodelete",{
+                    ids : ids  //将需要删除的newsId作为参数传入
+                },function(res){
+                    if (res.status==1) {
+                        tableIns.reload();
+                        layer.close(index);
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                })
+            })
+        }else{
+            layer.msg("请选择需要删除的专业");
+        }
+    })
+
+    //列表操作
+    table.on('tool(list)', function(obj){
+        var layEvent = obj.event,
+            data = obj.data;
+
+        if(layEvent === 'del'){ //删除
+            layer.confirm('确定删除 '+data.SP_Name+' 此专业？',{icon:3, title:'提示信息'},function(index){
+                $.post("prodelete",{
+                    ids : [data.SP_Id]  //将需要删除的newsId作为参数传入
+                },function(res){
+                    if (res.status==1) {
+                        tableIns.reload();
+                        layer.close(index);
+                    }else{
+                        layer.msg(res.msg);
+                    }
+                })
+            });
+        }
+    });
+
+    //控制表格编辑时文本的位置【跟随渲染时的位置】
+    $("body").on("click",".layui-table-body.layui-table-main tbody tr td",function(){
+        $(this).find(".layui-table-edit").addClass("layui-"+$(this).attr("align"));
+    });
+
+    table.on('edit(list)', function(obj){ //注：edit是固定事件名，test是table原始容器的属性 lay-filter="对应的值"
+        // console.log(obj.value); //得到修改后的值
+        // console.log(obj.field); //当前编辑的字段名
+        // console.log(obj.data); //所在行的所有相关数据
+
+        //提交数据
+        $.post("proact",{id: obj.data.SP_Id, field: obj.field, value: obj.value},function(res){
+            if (res.status == 1) {
+                layer.msg(res.msg);
+            }else{
+                layer.msg(res.msg);
+            }
+        })  
+    });
+
+});
+
+</script>
+</body>
+</html>
