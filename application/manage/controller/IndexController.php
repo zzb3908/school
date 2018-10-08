@@ -109,7 +109,7 @@ class IndexController extends BaseController
                         [
                             'title' => '约吧留言',
                             'icon' => 'icon-text',
-                            'href' => '/date/message',
+                            'href' => '/date/messages',
                             'spread' => false,
                         ],
                     ],

@@ -13,12 +13,12 @@ namespace app\manage\model;
 
 use think\Model;
 use app\common\service\Cache;
+use think\model\concern\SoftDelete;
 
 class DateModel extends Model{
 
     protected $table = 'extr_inviteinfo';
     protected $pk = 'II_Id';
-
 
     public function user()
     {

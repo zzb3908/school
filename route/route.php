@@ -13,7 +13,9 @@ Route::domain('manage.aixuejie.ajeelee.com', 'manage');
 Route::group([], function () {
 
     Route::get('date/index','date/index')->name('date.index');
-    Route::get('date/message','date/message')->name('date.index');
+    Route::get('date/messages','date/messages')->name('date.messages');
+    Route::get('date/show/:II_Id','date/show')->model('II_Id','\app\manage\model\DateModel')->name('date.show');
+    Route::post('date/destroy','date/destroy')->name('date.destroy');
 
 })->middleware('Auth');
 
