@@ -77,9 +77,8 @@ layui.use(['form','layer','laydate','table','laytpl'],function(){
             {type: "checkbox", fixed:"left", width:50},
             {field: 'C_Id', title: 'ID', width:60, align:"center", sort:true},
             {field: 'C_AddUName', title: '评论人'},
-            {field: 'C_DataTitle', title: '资讯标题', width:250},
+            {field: 'C_DataTitle', title: '约吧标题', width:250},
             {field: 'C_Content', title: '评论内容', width:350},
-            {field: 'C_ModuleName', title: '分类', width:60},
             {field: 'C_IsTop', title: '置顶', align:'center', templet:function(d){
                 var checked= '';
                 if (d.C_IsTop==1) {

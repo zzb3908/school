@@ -1,22 +1,19 @@
 <?php
 /**
- * 学校管理
- * SchoolsController.php
- * @version     v1.0
- * @date        2018-08-12
- * @author      iclubs <iclubs@126.com>
- * @copyright   Copyright (c) Openver.com
- * @link        http://www.openver.com
+ * Created by PhpStorm.
+ * User: 59470
+ * Date: 2018/10/9
+ * Time: 9:17
  */
 
 namespace app\manage\controller;
 
 use app\manage\model\CommentsModel;
-use app\manage\model\DateModel;
+use app\manage\model\InviteModel;
 use think\Request;
 use think\Validate;
 
-class DateController extends BaseController{
+class InviteController extends BaseController{
 
     public function indexAction()
     {
@@ -53,7 +50,7 @@ class DateController extends BaseController{
         }
 
         //获取数据
-        $result = DateModel::where($where)->paginate($page_size)->toArray();
+        $result = InviteModel::where($where)->paginate($page_size)->toArray();
 
         if ($result['data']) {
             $res = ['code'=>0, 'msg'=>'查询成功', 'count'=>$result['total'], 'data'=>$result['data']];
@@ -65,10 +62,10 @@ class DateController extends BaseController{
 
     /**
      * 约吧详情
-     * @param DateModel $data
+     * @param InviteModel $data
      * @return mixed
      */
-    public function showAction(DateModel $data)
+    public function showAction(InviteModel $data)
     {
         return $this->fetch('',compact('data'));
     }
@@ -81,7 +78,7 @@ class DateController extends BaseController{
     public function destroyAction(Request $request)
     {
         $ids = $request->only('ids');
-        DateModel::destroy($ids['ids']);
+        InviteModel::destroy($ids['ids']);
         return json(['status'=>1, 'msg'=>'删除成功']);
     }
 
