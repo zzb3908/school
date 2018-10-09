@@ -22,6 +22,15 @@ Route::group([], function () {
     Route::get('topic/index','topic/index')->name('topic.index');
     Route::post('topic/update','topic/update')->name('topic.update');
     Route::post('topic/destroy','topic/destroy')->name('topic.destroy');
+    //聚吧小组
+    Route::get('topic/group','topic/group')->name('topic.group');
+    Route::post('topic/groupupdate','topic/groupupdate')->name('topic.groupupdate');
+    Route::post('topic/groupdestroy','topic/groupdestroy')->name('topic.groupdestroy');
+
+    //赛吧
+    Route::get('competition/index','competition/index')->name('competition.index');
+    Route::get('competition/category/:pid','competition/category')->name('competition.category');
+    Route::get('competition/categorylist/:pid','competition/categorylist')->name('competition.categorylist');
 
 })->middleware('Auth');
 

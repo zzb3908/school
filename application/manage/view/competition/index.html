@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>约吧管理</title>
+    <title>赛吧管理</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -22,20 +22,11 @@
             <div class="layui-inline" style="margin-right:10px">
                 <a class="layui-btn layui-btn-danger layui-btn-normal delAll_btn">批量删除</a>
             </div>
-
-            <div class="layui-inline">
-                <select name="II_Status">
-                    <option value="">选择状态</option>
-                    <option value="2" <?php if($param['II_Status']==2){echo 'selected';}?>>已审核</option>
-                    <option value="1" <?php if($param['II_Status']==1){echo 'selected';}?>>待审核</option>
-                    <option value="0" <?php if($param['II_Status']===0){echo 'selected';}?>>草稿</option>
-                </select>
-            </div>
             <div class="layui-inline">
                 <div class="layui-input-inline">
-                    <input type="text" class="layui-input searchVal" placeholder="请输入搜索的标题" />
+                    <input type="text" class="layui-input searchVal" placeholder="请输入搜索的关键字" />
                 </div>
-                <a class="layui-btn search_btn" data-type="reload">搜索</a>
+                <a class="layui-btn search_btn" data-type="reload">关键字搜索</a>
             </div>
         </form>
     </blockquote>
@@ -56,7 +47,7 @@
     <!--操作-->
     <script type="text/html" id="newsListBar">
         <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
-        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="show">详情</a>
+        <!--<a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="show">详情</a>-->
     </script>
 </form>
 <script type="text/javascript" src="{:config('static_dir')}layui/layui.js?_v={:config('static_ver')}"></script>
@@ -83,44 +74,43 @@ layui.use(['form','layer','laydate','table','laytpl'],function(){
         id : "newsListTable",
         cols : [[
             {type: "checkbox", fixed:"left", width:50},
-            {field: 'II_Id', title: 'ID', width:60, align:"center"},
-            {field: 'II_Title', title: '活动标题', width:'15%', align:'center'},
-            {field: 'II_CostType', title: '费用类型', width:'7%', templet:function(d){
-                var type = '';
-                // 秀吧类型 1=图片，2=视频
-                if (d.II_CostType == "1") {
-                    type = '<i class="layui-icon">我请客</i>'
-                }else if(d.II_CostType == "2"){
-                    type = '<i class="layui-icon">费用AA</i>'
-                }else{
-                    type = '<i class="layui-icon">免费</i>'
-                }
-                return type;
-            }},
-            {field: 'II_Cost', title: '大概费用', align:'center'},
-            {field: 'II_Requirement', title: '人员要求', width:150, align:'center'},
-            {field: 'II_SchoolLimit', title: '活动类型', width:150, align:'center',templet:function(d){
-                    var type = '';
-                    // 秀吧类型 1=图片，2=视频
-                    if (d.II_SchoolLimit == "1") {
-                        type = '<i class="layui-icon">本校</i>'
-                    }else{
-                        type = '<i class="layui-icon">公开</i>'
-                    }
-                    return type;
-                }},
-            {field: 'II_SchoolName', title: '学校名称', width:'150', align:'center'},
-            {field: 'II_LimitPeopleNum', title: '限制人数', width:'100', align:'center'},
-            {field: 'II_JoinPeopleNum', title: '已经参加人数', width:'120', align:'center'},
-            {field: 'II_LikeCount', title: '关注人数', width:'100', align:'center'},
-            /*{field: 'II_Status', title: '状态', width:'80', align:'center',templet:"#newsStatus"},*/
-            {field: 'II_AddUName', title: '发布人', width:'100', align:'center'},
-            {field: 'II_BeginTime', title: '开始时间', minWidth:110, align:'center', templet:function(d){
-                    var myDate = new Date(d.II_BeginTime*1000);
+            {field: 'CI_Id', title: 'ID', width:60, align:"center"},
+            {field: 'CI_CC_Name', title: '类别名称', width:100, align:"center"},
+            {field: 'CI_Title', title: '比赛标题', width:100, align:'center'},
+            {field: 'CI_Content', title: '比赛详情', width:100, align:'center'},
+            {field: 'CI_Hosts', title: '主办方', width:100, align:'center'},
+            {field: 'CI_Organizers', title: '承办方', width:100, align:'center'},
+            {field: 'CI_Sponsor', title: '赞助商', width:100, align:'center'},
+            {field: 'CI_TitleSponsor', title: '冠名单位', width:100, align:'center'},
+            {field: 'CI_LevelId', title: '赛事级别', width:100, align:'center'},
+            {field: 'CI_LevelName', title: '赛事级别名称', width:120, align:'center'},
+            {field: 'CI_CostContent', title: '参赛费用说明', width:120, align:'center'},
+            {field: 'CI_Cost', title: '参赛费用', width:100, align:'center'},
+            {field: 'CI_Requirement', title: '参赛对象要求', width:120, align:'center'},
+            {field: 'CI_LocationName', title: '定位地址', width:100, align:'center'},
+            {field: 'CI_LimitPeopleNum', title: '限制人数', width:100, align:'center'},
+            {field: 'CI_EntryPeopleNum', title: '已报名人数', width:120, align:'center'},
+            {field: 'CI_LikeCount', title: '关注人数', width:100, align:'center'},
+            {field: 'CI_ViewCount', title: '浏览量', width:100, align:'center'},
+            {field: 'CI_AddUName', title: '发布人', width:100, align:'center'},
+            {field: 'CI_EntryBeginTime', title: '报名开始时间', minWidth:120, align:'center', templet:function(d){
+                    var myDate = new Date(d.CI_EntryBeginTime*1000);
                     return myDate.format('MM-dd hh:mm');
                 }},
-            {field: 'II_EndTime', title: '结束时间', minWidth:110, align:'center', templet:function(d){
-                    var myDate = new Date(d.II_EndTime*1000);
+            {field: 'CI_EntryEndTime', title: '报名结束时间', minWidth:120, align:'center', templet:function(d){
+                    var myDate = new Date(d.CI_EntryEndTime*1000);
+                    return myDate.format('MM-dd hh:mm');
+                }},
+            {field: 'CI_CompetitionBeginTime', title: '比赛开始时间', minWidth:120, align:'center', templet:function(d){
+                    var myDate = new Date(d.CI_CompetitionBeginTime*1000);
+                    return myDate.format('MM-dd hh:mm');
+                }},
+            {field: 'CI_CompetitionEndTime', title: '比赛结束时间', minWidth:120, align:'center', templet:function(d){
+                    var myDate = new Date(d.CI_CompetitionEndTime*1000);
+                    return myDate.format('MM-dd hh:mm');
+                }},
+            {field: 'CI_AddTime', title: '发布时间', minWidth:120, align:'center', templet:function(d){
+                    var myDate = new Date(d.CI_AddTime*1000);
                     return myDate.format('MM-dd hh:mm');
                 }},
             {title: '操作', width:130, templet:'#newsListBar',fixed:"right",align:"center"}
@@ -134,35 +124,10 @@ layui.use(['form','layer','laydate','table','laytpl'],function(){
                 curr: 1 //重新从第 1 页开始
             },
             where: {
-                II_Title: $(".searchVal").val(),  //搜索的关键字
-                II_Status: $("select[name=II_Status] option:selected").val(),
+                keyword: $(".searchVal").val(),  //搜索的关键字
             }
         })
     });
-
-    //查看约吧
-    function showNews(show){
-        var url = 'show/' + show.II_Id; title = '查看约吧详情';
-
-        var index = layui.layer.open({
-            title : title,
-            type : 2,
-            area : ['100%','100%'],
-            content : url,
-            success : function(layero, index){
-                setTimeout(function(){
-                    layui.layer.tips('点击此处返回约吧列表', '.layui-layer-setwin .layui-layer-close', {
-                        tips: 3
-                    });
-                },500)
-            }
-        })
-        // layui.layer.full(index);
-        //改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
-        // $(window).on("resize",function(){
-        //     layui.layer.full(index);
-        // })
-    }
 
     //批量删除
     $(".delAll_btn").click(function(){
@@ -171,9 +136,9 @@ layui.use(['form','layer','laydate','table','laytpl'],function(){
             ids = [];
         if(data.length > 0) {
             for (var i in data) {
-                ids.push(data[i].II_Id);
+                ids.push(data[i].CI_Id);
             }
-            layer.confirm('确定删除选中的约吧？', {icon: 3, title: '提示信息'}, function (index) {
+            layer.confirm('确定删除选中的赛吧？', {icon: 3, title: '提示信息'}, function (index) {
                 $.post("destroy",{
                     ids : ids  //将需要删除的newsId作为参数传入
                 },function(res){
@@ -186,7 +151,7 @@ layui.use(['form','layer','laydate','table','laytpl'],function(){
                 })
             })
         }else{
-            layer.msg("请选择需要删除的秀吧");
+            layer.msg("请选择需要删除的聚吧");
         }
     })
 
@@ -198,9 +163,9 @@ layui.use(['form','layer','laydate','table','laytpl'],function(){
         if(layEvent === 'show'){ //编辑
             showNews(data);
         } else if(layEvent === 'del'){ //删除
-            layer.confirm('确定删除 '+data.II_Title+' 此约吧？',{icon:3, title:'提示信息'},function(index){
+            layer.confirm('确定删除此赛吧？',{icon:3, title:'提示信息'},function(index){
                 $.post("destroy",{
-                    ids : [data.II_Id]  //将需要删除的newsId作为参数传入
+                    ids : [data.CI_Id]  //将需要删除的newsId作为参数传入
                 },function(res){
                     if (res.status==1) {
                         tableIns.reload();

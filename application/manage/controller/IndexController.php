@@ -129,7 +129,7 @@ class IndexController extends BaseController
                         [
                             'title' => '小组管理',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/topic/group',
                             'spread' => false,
                         ],
                     ],
@@ -143,19 +143,19 @@ class IndexController extends BaseController
                         [
                             'title' => '赛吧列表',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/competition/index',
                             'spread' => false,
                         ],
                         [
                             'title' => '比赛类别',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/competition/category/1',
                             'spread' => false,
                         ],
                         [
                             'title' => '赛事级别',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/competition/category/2',
                             'spread' => false,
                         ],
                     ],
