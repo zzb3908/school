@@ -88,7 +88,7 @@ class InviteController extends BaseController{
     }
 
     /**
-     * 约吧列表
+     * 约吧留言列表
      * @param Request $request
      * @return \think\response\Json
      * @throws \think\exception\DbException
