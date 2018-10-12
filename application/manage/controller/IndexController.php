@@ -197,7 +197,7 @@ class IndexController extends BaseController
                 [
                     'title' => '日程管理',
                     'icon' => 'icon-text',
-                    'href' => '/index/default',
+                    'href' => '/Calendar/index',
                     'spread' => false,
                 ],
                 [
@@ -229,25 +229,25 @@ class IndexController extends BaseController
                         [
                             'title' => '班级列表',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/class/index',
                             'spread' => false,
                         ],
                         [
                             'title' => '学生管理',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/class/userindex',
                             'spread' => false,
                         ],
                         [
                             'title' => '班级通知',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/Notifications/index?module=302',
                             'spread' => false,
                         ],
                         [
                             'title' => '请假管理',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/class/classleave',
                             'spread' => false,
                         ],
                     ],

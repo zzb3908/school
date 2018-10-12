@@ -70,8 +70,6 @@ class BookController extends BaseController{
         return json(['status'=>1, 'msg'=>'删除成功']);
     }
 
-
-
     /**
      * 是否开启评论
      * @param Request $request
@@ -217,8 +215,6 @@ class BookController extends BaseController{
         SpecialColumnModel::destroy($ids['ids']);
         return json(['status'=>1, 'msg'=>'删除成功']);
     }
-
-
 
     /**
      * 是否开启专题评论
