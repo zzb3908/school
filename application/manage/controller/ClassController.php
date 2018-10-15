@@ -8,7 +8,6 @@
 
 namespace app\manage\controller;
 
-use app\manage\model\CalendarModel;
 use app\manage\model\ClassleaveModel;
 use app\manage\model\ClassModel;
 use app\manage\model\ClassuserModel;
@@ -74,7 +73,7 @@ class ClassController extends BaseController{
             $where[] = ['TU_CI_Name|TU_UName','like',"%{$param['keyword']}%"];
         }
 
-        //获取数据
+        //获取数据,预加载防止N+1查询
         $result = ClassuserModel::with('classes')->where($where)->paginate($page_size)->toArray();
 
         if ($result['data']) {

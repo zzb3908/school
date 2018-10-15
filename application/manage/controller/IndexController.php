@@ -361,7 +361,7 @@ class IndexController extends BaseController
                 [
                     'title' => '用户中心',
                     'icon' => 'icon-text',
-                    'href' => '/static/manage/page/user/userList.html',
+                    'href' => '/users/index',
                     'spread' => false,
                 ],
                 // [

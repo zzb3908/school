@@ -9,9 +9,10 @@
 namespace app\manage\controller;
 
 use app\manage\model\CalendarModel;
+use app\manage\model\UsersModel;
 use think\Request;
 
-class CalendarController extends BaseController{
+class UsersController extends BaseController{
 
     public function indexAction()
     {
@@ -23,15 +24,18 @@ class CalendarController extends BaseController{
         //获取参数
         $page      = $request->page;
         $page_size = $request->limit;
-        $param     = $request->only('keyword');
+        $param     = $request->only('keyword,UI_UserType');
 
         //处理参数
         if($param['keyword']){
-            $where[] = ['CE_Title|CE_Content|CI_AddUName|CE_DataType','like',"%{$param['keyword']}%"];
+            $where[] = ['UI_Nickname|UI_Realname|UI_SchoolName','like',"%{$param['keyword']}%"];
+        }
+        if($param['UI_UserType']){
+            $where[] = ['UI_UserType','=',$param['UI_UserType']];
         }
 
         //获取数据
-        $result = CalendarModel::where($where)->paginate($page_size)->toArray();
+        $result = UsersModel::where($where)->paginate($page_size)->toArray();
 
         if ($result['data']) {
             $res = ['code'=>0, 'msg'=>'查询成功', 'count'=>$result['total'], 'data'=>$result['data']];
@@ -41,15 +45,10 @@ class CalendarController extends BaseController{
         return json($res);
     }
 
-    /**
-     * 删除书籍
-     * @param Request $request
-     * @return \think\response\Json
-     */
     public function destroyAction(Request $request)
     {
         $ids = $request->only('ids');
-        CalendarModel::destroy($ids['ids']);
+        UsersModel::destroy($ids['ids']);
         return json(['status'=>1, 'msg'=>'删除成功']);
     }
 
