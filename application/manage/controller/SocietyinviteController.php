@@ -8,13 +8,16 @@
 
 namespace app\manage\controller;
 
+use app\manage\model\BookcategoryModel;
+use app\manage\model\BookinfoModel;
 use app\manage\model\CalendarModel;
-use app\manage\model\ClassleaveModel;
-use app\manage\model\ClassModel;
-use app\manage\model\ClassuserModel;
+use app\manage\model\SocietyinvitealbumModel;
+use app\manage\model\SocietyinviteModel;
+use app\manage\model\SocietyuserModel;
 use think\Request;
+use think\Validate;
 
-class ClassController extends BaseController{
+class SocietyinviteController extends BaseController{
 
     public function indexAction()
     {
@@ -30,11 +33,11 @@ class ClassController extends BaseController{
 
         //处理参数
         if($param['keyword']){
-            $where[] = ['CI_Name|CI_HeadmasterName|CI_SchoolName|CI_AddUName','like',"%{$param['keyword']}%"];
+            $where[] = ['SI_SI_Name|SI_SchoolName','like',"%{$param['keyword']}%"];
         }
 
         //获取数据
-        $result = ClassModel::where($where)->paginate($page_size)->toArray();
+        $result = SocietyinviteModel::where($where)->paginate($page_size)->toArray();
 
         if ($result['data']) {
             $res = ['code'=>0, 'msg'=>'查询成功', 'count'=>$result['total'], 'data'=>$result['data']];
@@ -45,24 +48,23 @@ class ClassController extends BaseController{
     }
 
     /**
-     * 删除班级
+     * 删除书籍
      * @param Request $request
      * @return \think\response\Json
      */
     public function destroyAction(Request $request)
     {
         $ids = $request->only('ids');
-        ClassModel::destroy($ids['ids']);
+        SocietyinviteModel::destroy($ids['ids']);
         return json(['status'=>1, 'msg'=>'删除成功']);
     }
 
-    //班级成员
-    public function userindexAction()
+    public function societyinvitealbumAction()
     {
         return $this->fetch();
     }
 
-    public function userlistAction(Request $request)
+    public function societyinvitealbumListAction(Request $request)
     {
         //获取参数
         $page      = $request->page;
@@ -71,11 +73,12 @@ class ClassController extends BaseController{
 
         //处理参数
         if($param['keyword']){
-            $where[] = ['TU_CI_Name|TU_UName','like',"%{$param['keyword']}%"];
+            $where[] = ['SI_SI_Name|SI_SchoolName','like',"%{$param['keyword']}%"];
         }
 
         //获取数据
-        $result = ClassuserModel::with('classes')->where($where)->paginate($page_size)->toArray();
+        $result = SocietyinvitealbumModel::with('societyinvite')->where($where)->paginate($page_size)->toArray();
+
 
         if ($result['data']) {
             $res = ['code'=>0, 'msg'=>'查询成功', 'count'=>$result['total'], 'data'=>$result['data']];
@@ -85,24 +88,19 @@ class ClassController extends BaseController{
         return json($res);
     }
 
-    /**
-     * 删除班级成员
-     * @param Request $request
-     * @return \think\response\Json
-     */
-    public function userdestroyAction(Request $request)
+    public function societyinvitealbumDestroyAction(Request $request)
     {
         $ids = $request->only('ids');
-        ClassuserModel::destroy($ids['ids']);
+        SocietyinvitealbumModel::destroy($ids['ids']);
         return json(['status'=>1, 'msg'=>'删除成功']);
     }
 
-    public function classleaveAction()
+    public function societyuserAction()
     {
         return $this->fetch();
     }
 
-    public function leavelistAction(Request $request)
+    public function societyuserListAction(Request $request)
     {
         //获取参数
         $page      = $request->page;
@@ -111,11 +109,12 @@ class ClassController extends BaseController{
 
         //处理参数
         if($param['keyword']){
-            $where[] = ['CL_AddUName|CL_AuditUName','like',"%{$param['keyword']}%"];
+            $where[] = ['SU_SI_Name|SU_UName|SU_AuditUName','like',"%{$param['keyword']}%"];
         }
 
         //获取数据
-        $result = ClassleaveModel::where($where)->paginate($page_size)->toArray();
+        $result = SocietyuserModel::where($where)->paginate($page_size)->toArray();
+
 
         if ($result['data']) {
             $res = ['code'=>0, 'msg'=>'查询成功', 'count'=>$result['total'], 'data'=>$result['data']];
@@ -125,16 +124,12 @@ class ClassController extends BaseController{
         return json($res);
     }
 
-    /**
-     * 删除班级成员
-     * @param Request $request
-     * @return \think\response\Json
-     */
-    public function leavedestroyAction(Request $request)
+    public function societyuserDestroyAction(Request $request)
     {
         $ids = $request->only('ids');
-        ClassleaveModel::destroy($ids['ids']);
+        SocietyuserModel::destroy($ids['ids']);
         return json(['status'=>1, 'msg'=>'删除成功']);
     }
+
 
 }

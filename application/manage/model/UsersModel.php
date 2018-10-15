@@ -19,4 +19,9 @@ class UsersModel extends Model{
     protected $table = 'own_userinfo';
     protected $pk = 'UI_Id';
 
+
+    public function schoolAction()
+    {
+        return $this->belongsTo('SchoolsModel','UI_SchoolId','S_Id');
+    }
 }

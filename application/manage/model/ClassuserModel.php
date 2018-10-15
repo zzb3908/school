@@ -17,7 +17,7 @@ class ClassuserModel extends Model{
 
     public function classes()
     {
-        return $this->belongsTo(ClassModel::class,'TU_CI_Id','CI_Id')->field('CI_SchoolName,CI_Id')->bind('CI_SchoolName');
+        return $this->belongsTo('ClassModel','TU_CI_Id','CI_Id')->field('CI_SchoolName,CI_Id')->bind('CI_SchoolName');
     }
 
 }

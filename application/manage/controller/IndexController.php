@@ -261,7 +261,7 @@ class IndexController extends BaseController
                         [
                             'title' => '社团活动',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/Societyinvite/index',
                             'spread' => false,
                             'children' => [
                                 [
@@ -281,13 +281,13 @@ class IndexController extends BaseController
                         [
                             'title' => '相册管理',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/Societyinvite/societyinvitealbum',
                             'spread' => false,
                         ],
                         [
                             'title' => '社团成员',
                             'icon' => 'icon-text',
-                            'href' => '/index/default',
+                            'href' => '/Societyinvite/societyuser',
                             'spread' => false,
                         ],
                     ],
@@ -361,7 +361,7 @@ class IndexController extends BaseController
                 [
                     'title' => '用户中心',
                     'icon' => 'icon-text',
-                    'href' => '/users/index',
+                    'href' => '/static/manage/page/user/userList.html',
                     'spread' => false,
                 ],
                 // [
