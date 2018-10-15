@@ -17,8 +17,5 @@ class InviteModel extends Model{
     protected $table = 'extr_inviteinfo';
     protected $pk = 'II_Id';
 
-    public function user()
-    {
-        return $this->hasOne('UsersModel','II_AddUId','UI_Id');
-    }
+
 }
